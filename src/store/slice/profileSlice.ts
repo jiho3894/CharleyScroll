@@ -7,22 +7,23 @@ export interface Profile {
   id: string;
 }
 
-interface ProfileState {
+export interface ProfileState {
   profile: Profile[];
-  isLoading: boolean;
 }
 
 const initialState: ProfileState = {
   profile: [],
-  isLoading: false,
 };
 
-export const __getProfile = createAsyncThunk("profile/get", async () => {
-  const data = await axios.get(
-    "https://62a09c0fa9866630f8134879.mockapi.io/profile"
-  );
-  return data.data;
-});
+export const __getProfile = createAsyncThunk(
+  "profile/get",
+  async (num: number) => {
+    const data = await axios.get(
+      `https://62a09c0fa9866630f8134879.mockapi.io/profile?p=1&l=${num}`
+    );
+    return data.data;
+  }
+);
 
 export const __postProfile = createAsyncThunk(
   "profile/post",
@@ -50,13 +51,8 @@ const profileSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(__getProfile.pending, (state) => {
-      state.isLoading = true;
-    });
     builder.addCase(__getProfile.fulfilled, (state, action) => {
-      if (state.isLoading) {
-        state.profile = action.payload;
-      }
+      state.profile = action.payload;
     });
     builder.addCase(__postProfile.fulfilled, (state, action) => {
       state.profile.push(action.payload);
